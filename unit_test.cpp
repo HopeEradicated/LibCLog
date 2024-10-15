@@ -55,7 +55,7 @@ void testMemoryReallocation() {
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
     // Test file I/O
-    //testFileIO();
+    testFileIO();
 
     // Test dynamic memory allocation
     testMemoryAllocation();
