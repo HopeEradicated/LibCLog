@@ -13,23 +13,23 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fstream>
-#include <semaphore.h>
+#include <atomic>
 
 namespace libcwrapper 
 {
     // Constants for shared memory and semaphores
-    int SHARED_MEMORY_SIZE = 1024;
+    const int SHARED_MEMORY_SIZE = 4096;
     const char* SHARED_MEMORY_FILEIO_NAME = "/shm_fileio";
     const char* SHARED_MEMORY_MEMMGMT_NAME = "/shm_memmgmt";
-    const char* SEMAPHORE_NAME_FILEIO = "/sem_fileio";
-    const char* SEMAPHORE_NAME_MEMMGMT = "/sem_memmgmt";
+
+    struct SharedMemoryData {
+        std::atomic<int> offset;
+        char buffer[SHARED_MEMORY_SIZE - sizeof(int)];
+    };
 
     // Shared resources
-    char* shared_memory_buffer_fileio = nullptr;
-    char* shared_memory_buffer_memmgmt = nullptr;
-    sem_t* shared_memory_semaphore = nullptr;
-    int offset_fileio = 0;
-    int offset_memmgmt = 0;
+    SharedMemoryData* shared_memory_data_fileio = nullptr;
+    SharedMemoryData* shared_memory_data_memmgmt = nullptr;
 
     void handleError(bool condition, const char* error_message) {
         if (condition) {
@@ -48,7 +48,7 @@ namespace libcwrapper
         std::getline(cmdline_file, process_name, '\0');
         handleError(process_name.empty(),"Failed to read process name");
         */
-        return "process_name"; // Placeholder return
+        return "pn"; // Placeholder return
     }
 
     std::string getCurrentTimestamp() {
@@ -64,24 +64,32 @@ namespace libcwrapper
     }
 
     // Initialize shared memory buffer
-    void initializeSharedMemory(const char* shm_name, char*& shared_memory_buffer) {
+    void initializeSharedMemory(const char* shm_name, SharedMemoryData*& shared_memory_buffer) {
         int shared_memory_fd = shm_open(shm_name, O_RDWR, 0666);
         handleError(shared_memory_fd == -1, "Failed to open shared memory");
-        handleError(ftruncate(shared_memory_fd, SHARED_MEMORY_SIZE) == -1, "Failed to set shared memory size");
-        shared_memory_buffer = static_cast<char*>(mmap(nullptr, SHARED_MEMORY_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shared_memory_fd, 0));
+        bool is_newly_created = (errno == ENOENT);
+        handleError(ftruncate(shared_memory_fd, sizeof(SharedMemoryData)) == -1, "Failed to set shared memory size");
+        shared_memory_buffer = static_cast<SharedMemoryData*>(mmap(nullptr, sizeof(SharedMemoryData), PROT_READ | PROT_WRITE, MAP_SHARED, shared_memory_fd, 0));
         handleError(shared_memory_buffer == MAP_FAILED, "Failed to map shared memory");
-        memset(shared_memory_buffer, 0, SHARED_MEMORY_SIZE);
     }
 
-    void writeToSharedMemory(char* shared_memory_buffer, int& shared_memory_offset, const char* message) {
-        int message_length = strlen(message);
-        if (shared_memory_offset + message_length >= SHARED_MEMORY_SIZE) {
-            shared_memory_offset = 0;
+    void writeToSharedMemory(SharedMemoryData* shared_memory_data, const char* message) {
+        int message_length = std::min(static_cast<int>(strlen(message)), 256);
+        int current_offset = shared_memory_data->offset.load(std::memory_order_relaxed);
+
+        while (true) {
+            int new_offset = current_offset + message_length;
+            if (new_offset >= SHARED_MEMORY_SIZE - sizeof(std::atomic<int>)) {
+                new_offset = 0; 
+            }
+
+            if (shared_memory_data->offset.compare_exchange_weak(current_offset, new_offset, std::memory_order_acquire, std::memory_order_relaxed)) {
+                memcpy(shared_memory_data->buffer + current_offset, message, message_length);
+                break;
+            } else {
+                current_offset = shared_memory_data->offset.load(std::memory_order_relaxed);
+            }
         }
-        message_length = std::min(message_length, static_cast<int>(SHARED_MEMORY_SIZE - shared_memory_offset));
-        memcpy(shared_memory_buffer + shared_memory_offset, message, message_length);
-        shared_memory_offset += message_length;
-        memset(shared_memory_buffer + shared_memory_offset, 0, SHARED_MEMORY_SIZE - shared_memory_offset);
     }
 
     // Function pointers for libc functions
@@ -96,8 +104,8 @@ namespace libcwrapper
 
     __attribute__((constructor))
     void initializeLibrary() {
-        initializeSharedMemory(SHARED_MEMORY_FILEIO_NAME, shared_memory_buffer_fileio);
-        initializeSharedMemory(SHARED_MEMORY_MEMMGMT_NAME, shared_memory_buffer_memmgmt);
+        initializeSharedMemory(SHARED_MEMORY_FILEIO_NAME, shared_memory_data_fileio);
+        initializeSharedMemory(SHARED_MEMORY_MEMMGMT_NAME, shared_memory_data_memmgmt);
 
         // Load libc function pointers
         libc_open = (int (*)(const char*, int))dlsym(RTLD_NEXT, "open");
@@ -116,8 +124,8 @@ namespace libcwrapper
     // Cleanup the library
     __attribute__((destructor))
     void finalizeLibrary() {
-        munmap(shared_memory_buffer_fileio, SHARED_MEMORY_SIZE);
-        munmap(shared_memory_buffer_memmgmt, SHARED_MEMORY_SIZE);
+        munmap(shared_memory_data_fileio, SHARED_MEMORY_SIZE);
+        munmap(shared_memory_data_memmgmt, SHARED_MEMORY_SIZE);
     }
 
     // Intercepted libc functions
@@ -132,7 +140,7 @@ namespace libcwrapper
             snprintf(log_message, sizeof(log_message), 
                      "[%s] PID=%d, process=%s, open: filename=%s, flags=%d, fd=%d\n",
                      timestamp.c_str(), getpid(), process_name.c_str(), filename, flags, file_descriptor);
-            writeToSharedMemory(shared_memory_buffer_fileio, offset_fileio, log_message);
+            writeToSharedMemory(shared_memory_data_fileio, log_message);
             return file_descriptor;
         }
 
@@ -146,7 +154,7 @@ namespace libcwrapper
             snprintf(log_message, sizeof(log_message), 
                      "[%s] PID=%d, process=%s, close: fd=%d, rc=%d\n",
                      timestamp.c_str(), getpid(), process_name.c_str(), fd, return_code);
-            writeToSharedMemory(shared_memory_buffer_fileio, offset_fileio, log_message);
+            writeToSharedMemory(shared_memory_data_fileio, log_message);
             return return_code;
         }
 
@@ -160,7 +168,7 @@ namespace libcwrapper
             snprintf(log_message, sizeof(log_message), 
                      "[%s] PID=%d, process=%s, lseek: fd=%d, offset=%ld, whence=%d, result=%ld\n",
                      timestamp.c_str(), getpid(), process_name.c_str(), fd, offset, whence, result);
-            writeToSharedMemory(shared_memory_buffer_fileio, offset_fileio, log_message);
+            writeToSharedMemory(shared_memory_data_fileio, log_message);
             return result;
         }
 
@@ -174,7 +182,7 @@ namespace libcwrapper
             snprintf(log_message, sizeof(log_message), 
                      "[%s] PID=%d, process=%s, read: fd=%d, buf=%p, count=%zu, bytes_read=%zd\n",
                      timestamp.c_str(), getpid(), process_name.c_str(), fd, buffer, count, bytes_read);
-            writeToSharedMemory(shared_memory_buffer_fileio, offset_fileio, log_message);
+            writeToSharedMemory(shared_memory_data_fileio, log_message);
             return bytes_read;
         }
 
@@ -188,7 +196,7 @@ namespace libcwrapper
             snprintf(log_message, sizeof(log_message), 
                      "[%s] PID=%d, process=%s, write: fd=%d, buf=%p, count=%zu, bytes_written=%zd\n",
                      timestamp.c_str(), getpid(), process_name.c_str(), fd, buffer, count, bytes_written);
-            writeToSharedMemory(shared_memory_buffer_fileio, offset_fileio, log_message);
+            writeToSharedMemory(shared_memory_data_fileio, log_message);
             return bytes_written;
         }
         /*
@@ -206,7 +214,7 @@ namespace libcwrapper
             snprintf(log_message, sizeof(log_message), 
                      "[%s] PID=%d, process=%s, malloc: size=%zu, ptr=%p\n",
                      timestamp.c_str(), getpid(), process_name.c_str(), size, pointer);
-            writeToSharedMemory(shared_memory_buffer_memmgmt, offset_memmgmt, log_message);
+            writeToSharedMemory(shared_memory_data_memmgmt, offset_memmgmt, log_message);
             return pointer;
         }*/
 

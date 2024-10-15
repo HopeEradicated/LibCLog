@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <chrono>
 
 // Function to check for errors and handle them appropriately
 void handleError(bool condition, const char* error_message) {
@@ -54,14 +55,20 @@ void testMemoryReallocation() {
 }
 
 int main() {
+
+    auto start = std::chrono::high_resolution_clock::now();
     // Test file I/O
     testFileIO();
 
     // Test dynamic memory allocation
-    //testMemoryAllocation();
+    testMemoryAllocation();
 
     // Test memory reallocation
     testMemoryReallocation();
 
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> duration = end - start;
+    std::cout << "Exec time: " << duration.count() << " sec" << std::endl;
     return 0;
 }
