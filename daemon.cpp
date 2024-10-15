@@ -1,13 +1,11 @@
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <cstring>
+#include <csignal>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <cstring>
-#include <csignal>
-#include <chrono>
 
 // Constants
 const int SHARED_MEMORY_SIZE = 4096;
@@ -71,7 +69,7 @@ void daemonize(const char* daemon_mode, const char* log_file_name, int poll_inte
         std::string data(shared_memory_data->buffer, strnlen(shared_memory_data->buffer, SHARED_MEMORY_SIZE - sizeof(int)));
         if (!data.empty()) {
             log_file << data;
-            log_file << "\n";
+            //log_file << "\n";
             log_file.flush();
             memset(shared_memory_data->buffer, 0, SHARED_MEMORY_SIZE - sizeof(int));
             shared_memory_data->offset = 0;

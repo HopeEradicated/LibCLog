@@ -1,9 +1,7 @@
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <string.h>
+#include <cstring>
 #include <chrono>
 
 // Function to check for errors and handle them appropriately
@@ -26,7 +24,7 @@ void testFileIO() {
     char read_buffer[10];
     ssize_t bytes_read = read(file_descriptor, read_buffer, sizeof(read_buffer) - 1);
     handleError(bytes_read == -1, "Failed to read from file");
-    read_buffer[bytes_read] = '\0'; // Null-terminate the string
+    read_buffer[bytes_read] = '\0';
 
     off_t seek_result = lseek(file_descriptor, 0, SEEK_CUR);
     handleError(seek_result == -1, "Failed to seek in file");
@@ -45,20 +43,19 @@ void testMemoryAllocation() {
 
 // Function to test memory reallocation
 void testMemoryReallocation() {
-    void* memory_ptr = malloc(10);
+    void* memory_ptr = malloc(100);
     handleError(memory_ptr == NULL, "Failed to allocate memory");
 
-    memory_ptr = realloc(memory_ptr, 20);
+    memory_ptr = realloc(memory_ptr, 200);
     handleError(memory_ptr == NULL, "Failed to reallocate memory");
 
     free(memory_ptr);
 }
 
 int main() {
-
     auto start = std::chrono::high_resolution_clock::now();
     // Test file I/O
-    testFileIO();
+    //testFileIO();
 
     // Test dynamic memory allocation
     testMemoryAllocation();

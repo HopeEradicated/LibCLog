@@ -65,6 +65,16 @@ CMAKE_BINARY_DIR = /home/admin/LibCLog/build
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+.PHONY : test/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "No interactive CMake dialog available..."
@@ -156,17 +166,17 @@ unit_test/fast:
 .PHONY : unit_test/fast
 
 #=============================================================================
-# Target rules for targets named run_daemons
+# Target rules for targets named test_interceptor
 
 # Build rule for target.
-run_daemons: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_daemons
-.PHONY : run_daemons
+test_interceptor: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_interceptor
+.PHONY : test_interceptor
 
 # fast build rule for target.
-run_daemons/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_daemons.dir/build.make CMakeFiles/run_daemons.dir/build
-.PHONY : run_daemons/fast
+test_interceptor/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_interceptor.dir/build.make CMakeFiles/test_interceptor.dir/build
+.PHONY : test_interceptor/fast
 
 daemon.o: daemon.cpp.o
 .PHONY : daemon.o
@@ -248,7 +258,8 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... run_daemons"
+	@echo "... test"
+	@echo "... test_interceptor"
 	@echo "... daemon"
 	@echo "... libc_interceptor"
 	@echo "... unit_test"

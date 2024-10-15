@@ -76,7 +76,7 @@ preinstall:
 clean: CMakeFiles/libc_interceptor.dir/clean
 clean: CMakeFiles/daemon.dir/clean
 clean: CMakeFiles/unit_test.dir/clean
-clean: CMakeFiles/run_daemons.dir/clean
+clean: CMakeFiles/test_interceptor.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -158,30 +158,30 @@ CMakeFiles/unit_test.dir/clean:
 .PHONY : CMakeFiles/unit_test.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/run_daemons.dir
+# Target rules for target CMakeFiles/test_interceptor.dir
 
 # All Build rule for target.
-CMakeFiles/run_daemons.dir/all: CMakeFiles/daemon.dir/all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_daemons.dir/build.make CMakeFiles/run_daemons.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_daemons.dir/build.make CMakeFiles/run_daemons.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/admin/LibCLog/build/CMakeFiles --progress-num= "Built target run_daemons"
-.PHONY : CMakeFiles/run_daemons.dir/all
+CMakeFiles/test_interceptor.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_interceptor.dir/build.make CMakeFiles/test_interceptor.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_interceptor.dir/build.make CMakeFiles/test_interceptor.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/admin/LibCLog/build/CMakeFiles --progress-num= "Built target test_interceptor"
+.PHONY : CMakeFiles/test_interceptor.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/run_daemons.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/admin/LibCLog/build/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/run_daemons.dir/all
+CMakeFiles/test_interceptor.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/admin/LibCLog/build/CMakeFiles 0
-.PHONY : CMakeFiles/run_daemons.dir/rule
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_interceptor.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/admin/LibCLog/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_interceptor.dir/rule
 
 # Convenience name for target.
-run_daemons: CMakeFiles/run_daemons.dir/rule
-.PHONY : run_daemons
+test_interceptor: CMakeFiles/test_interceptor.dir/rule
+.PHONY : test_interceptor
 
 # clean rule for target.
-CMakeFiles/run_daemons.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_daemons.dir/build.make CMakeFiles/run_daemons.dir/clean
-.PHONY : CMakeFiles/run_daemons.dir/clean
+CMakeFiles/test_interceptor.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_interceptor.dir/build.make CMakeFiles/test_interceptor.dir/clean
+.PHONY : CMakeFiles/test_interceptor.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

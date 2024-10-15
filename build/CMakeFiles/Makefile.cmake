@@ -47,5 +47,5 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/libc_interceptor.dir/DependInfo.cmake"
   "CMakeFiles/daemon.dir/DependInfo.cmake"
   "CMakeFiles/unit_test.dir/DependInfo.cmake"
-  "CMakeFiles/run_daemons.dir/DependInfo.cmake"
+  "CMakeFiles/test_interceptor.dir/DependInfo.cmake"
   )

@@ -1,0 +1,35 @@
+Start testing: Oct 15 11:41 MSK
+----------------------------------------------------------
+1/2 Testing: daemon_fileio
+1/2 Test: daemon_fileio
+Command: "/usr/bin/timeout" "10s" "<TARGET_FILE:daemon>" "fileio" "fileio.txt" "1"
+Directory: /home/admin/LibCLog/build
+"daemon_fileio" start time: Oct 15 11:41 MSK
+Output:
+----------------------------------------------------------
+/usr/bin/timeout: failed to run command ‘<TARGET_FILE:daemon>’: No such file or directory
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Failed.
+"daemon_fileio" end time: Oct 15 11:41 MSK
+"daemon_fileio" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: daemon_memmgmt
+2/2 Test: daemon_memmgmt
+Command: "/usr/bin/timeout" "10s" "<TARGET_FILE:daemon>" "memmgmt" "memmgmt.txt" "1"
+Directory: /home/admin/LibCLog/build
+"daemon_memmgmt" start time: Oct 15 11:41 MSK
+Output:
+----------------------------------------------------------
+/usr/bin/timeout: failed to run command ‘<TARGET_FILE:daemon>’: No such file or directory
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Failed.
+"daemon_memmgmt" end time: Oct 15 11:41 MSK
+"daemon_memmgmt" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 15 11:41 MSK
