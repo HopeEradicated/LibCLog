@@ -1,0 +1,1 @@
+/usr/bin/gcc -g CMakeFiles/deamon_file_io.dir/daemon_file_io.c.o -o deamon_file_io  -Wl,-rpath,/home/admin/LibCLog/build: liblibc_wrapper.so -lrt 

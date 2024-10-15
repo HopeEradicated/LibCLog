@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC -g -shared -Wl,-soname,liblibc_wrapper.so -o liblibc_wrapper.so CMakeFiles/libc_wrapper.dir/libc_wrapper.cpp.o  -ldl 

@@ -1,0 +1,1 @@
+/usr/bin/g++ -g CMakeFiles/daemon_mem_mgmt.dir/daemon_mem_mgmt.cpp.o -o daemon_mem_mgmt 

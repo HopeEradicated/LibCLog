@@ -1,0 +1,1 @@
+/usr/bin/gcc -g -rdynamic CMakeFiles/LibCLog.dir/unit_test.c.o -o LibCLog 

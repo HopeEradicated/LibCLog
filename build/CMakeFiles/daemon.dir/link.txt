@@ -1,0 +1,1 @@
+/usr/bin/g++ -g CMakeFiles/daemon.dir/daemon.cpp.o -o daemon 

@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC -g -shared -Wl,-soname,liblibc_interceptor.so -o liblibc_interceptor.so CMakeFiles/libc_interceptor.dir/libc_interceptor.cpp.o  -ldl 

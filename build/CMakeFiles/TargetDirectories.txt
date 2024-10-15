@@ -1,0 +1,6 @@
+/home/admin/LibCLog/build/CMakeFiles/libc_interceptor.dir
+/home/admin/LibCLog/build/CMakeFiles/daemon.dir
+/home/admin/LibCLog/build/CMakeFiles/unit_test.dir
+/home/admin/LibCLog/build/CMakeFiles/run_daemons.dir
+/home/admin/LibCLog/build/CMakeFiles/edit_cache.dir
+/home/admin/LibCLog/build/CMakeFiles/rebuild_cache.dir

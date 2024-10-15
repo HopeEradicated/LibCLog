@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/admin/LibCLog/build",
+  "command": "/usr/bin/g++ -Dlibc_interceptor_EXPORTS  -g -fPIC -o CMakeFiles/libc_interceptor.dir/libc_interceptor.cpp.o -c /home/admin/LibCLog/libc_interceptor.cpp",
+  "file": "/home/admin/LibCLog/libc_interceptor.cpp",
+  "output": "CMakeFiles/libc_interceptor.dir/libc_interceptor.cpp.o"
+},
+{
+  "directory": "/home/admin/LibCLog/build",
+  "command": "/usr/bin/g++   -g -o CMakeFiles/daemon.dir/daemon.cpp.o -c /home/admin/LibCLog/daemon.cpp",
+  "file": "/home/admin/LibCLog/daemon.cpp",
+  "output": "CMakeFiles/daemon.dir/daemon.cpp.o"
+},
+{
+  "directory": "/home/admin/LibCLog/build",
+  "command": "/usr/bin/g++   -g -o CMakeFiles/unit_test.dir/unit_test.cpp.o -c /home/admin/LibCLog/unit_test.cpp",
+  "file": "/home/admin/LibCLog/unit_test.cpp",
+  "output": "CMakeFiles/unit_test.dir/unit_test.cpp.o"
+}
+]
